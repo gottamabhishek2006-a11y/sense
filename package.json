@@ -1,0 +1,19 @@
+{
+  "name": "sense",
+  "version": "1.0.0",
+  "description": "CivicSense / CivicFix - Smart Civic Issue Reporting Platform",
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "build:client": "npm --prefix client run build",
+    "start:server": "npm --prefix server start",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev"
+  },
+  "keywords": [
+    "civicfix",
+    "civicsense",
+    "mern"
+  ],
+  "author": "",
+  "license": "ISC"
+}

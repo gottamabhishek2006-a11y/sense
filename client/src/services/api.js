@@ -1,6 +1,31 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const getApiBaseUrl = () => {
+  // Explicitly configured environment variable
+  if (import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== '') {
+    return import.meta.env.VITE_API_URL.trim();
+  }
+
+  // Dynamic detection in browser environment
+  if (typeof window !== 'undefined' && window.location) {
+    const hostname = window.location.hostname;
+    const isLocal =
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '0.0.0.0' ||
+      hostname.endsWith('.local');
+
+    if (!isLocal) {
+      // Deployed cloud production backend
+      return 'https://sense-3n8z.onrender.com/api';
+    }
+  }
+
+  // Default for local development
+  return 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -8,7 +33,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
-  timeout: 15000,
+  timeout: 20000,
 });
 
 // Request Interceptor: Attach JWT Bearer token if present

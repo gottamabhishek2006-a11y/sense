@@ -5,13 +5,17 @@ const generateToken = require('../utils/generateToken');
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-// Cookie configuration helper
-const setAuthCookie = (res, token) => {
-  const isProduction = process.env.NODE_ENV === 'production';
+// Cookie configuration helper supporting cross-site HTTPS (Render <-> Vercel) and localhost HTTP
+const setAuthCookie = (res, token, req) => {
+  const isHttps =
+    Boolean(req?.secure) ||
+    req?.headers?.['x-forwarded-proto'] === 'https' ||
+    process.env.NODE_ENV === 'production';
+
   res.cookie('civicfix_token', token, {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
+    secure: isHttps,
+    sameSite: isHttps ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
   });
@@ -127,7 +131,7 @@ const signup = async (req, res, next) => {
 
     // 8. Generate JWT & set secure cookie
     const token = generateToken(user._id, user.role);
-    setAuthCookie(res, token);
+    setAuthCookie(res, token, req);
 
     return res.status(201).json({
       success: true,
@@ -189,7 +193,7 @@ const login = async (req, res, next) => {
 
     // Generate JWT & set secure cookie
     const token = generateToken(user._id, user.role);
-    setAuthCookie(res, token);
+    setAuthCookie(res, token, req);
 
     return res.status(200).json({
       success: true,
@@ -233,11 +237,15 @@ const getMe = async (req, res) => {
  * @access  Public
  */
 const logout = async (req, res) => {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isHttps =
+    Boolean(req?.secure) ||
+    req?.headers?.['x-forwarded-proto'] === 'https' ||
+    process.env.NODE_ENV === 'production';
+
   res.clearCookie('civicfix_token', {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
+    secure: isHttps,
+    sameSite: isHttps ? 'none' : 'lax',
     path: '/',
   });
 

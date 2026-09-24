@@ -8,41 +8,61 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 const app = express();
 
+// Enable trust proxy for Render, Railway, Fly.io reverse proxies
+app.set('trust proxy', 1);
+
 // Middleware: Cookie Parser
 app.use(cookieParser());
 
 // Connect to MongoDB Atlas
 connectDB();
 
-// Middleware: CORS
+// Middleware: CORS Configuration
+const defaultOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+  'https://civic-sense-chi.vercel.app',
+];
+
 const configuredOrigins = (process.env.CLIENT_URL || '')
   .split(',')
   .map((url) => url.trim().replace(/\/$/, ''))
   .filter(Boolean);
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'http://localhost:3000',
-  ...configuredOrigins,
-];
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...configuredOrigins]));
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, curl, or Postman)
-      if (!origin) return callback(null, true);
-      const normalizedOrigin = origin.replace(/\/$/, '');
-      if (allowedOrigins.indexOf(normalizedOrigin) !== -1 || process.env.NODE_ENV !== 'production') {
-        return callback(null, true);
-      }
-      return callback(new Error('Blocked by CORS policy'));
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, or Postman)
+    if (!origin) return callback(null, true);
+
+    const normalizedOrigin = origin.replace(/\/$/, '');
+
+    // Allow configured origins or matching Vercel preview deployments
+    const isVercelPreview = /^https:\/\/civic-sense.*\.vercel\.app$/.test(normalizedOrigin);
+    if (allowedOrigins.indexOf(normalizedOrigin) !== -1 || isVercelPreview || process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Blocked by CORS policy for origin: ${origin}`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+  ],
+  exposedHeaders: ['Set-Cookie'],
+  maxAge: 86400,
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Middleware: Body Parsers
 app.use(express.json());

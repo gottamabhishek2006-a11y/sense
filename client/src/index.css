@@ -8,23 +8,64 @@
   }
   
   body {
-    @apply bg-slate-50 text-slate-800 antialiased font-sans;
+    @apply text-slate-900 antialiased font-sans;
   }
 }
 
 @layer utilities {
+  .shader-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: auto;
+    z-index: 0;
+  }
+
+  .hero-content-layer {
+    position: relative;
+    z-index: 10;
+  }
+
+  .civic-world-background {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .atmosphere-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: rgba(5, 20, 14, 0.08);
+  }
+
+  .civic-glass-card {
+    background: rgba(8, 30, 20, 0.38);
+    border: 1px solid rgba(110, 220, 170, 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
   .glass-card {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(226, 232, 240, 0.8);
+    background: rgba(235, 245, 238, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(180, 206, 188, 0.45);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
   }
 
   .glass-card-dark {
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(51, 65, 85, 0.6);
+    background: rgba(8, 30, 20, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(110, 220, 170, 0.2);
   }
 
   .civic-gradient-text {

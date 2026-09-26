@@ -35,7 +35,14 @@ const Navbar = ({ onOpenReportModal }) => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 transition-all shadow-sm">
+    <header
+      className="sticky top-0 z-20 border-b border-emerald-900/10 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+      style={{
+        background: 'rgba(235, 245, 238, 0.78)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* CivicFix Brand & Logo */}

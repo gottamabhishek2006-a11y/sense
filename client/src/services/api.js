@@ -59,7 +59,8 @@ api.interceptors.response.use(
       const isAuthEndpoint =
         error.config.url.includes('/auth/login') ||
         error.config.url.includes('/auth/signup') ||
-        error.config.url.includes('/auth/check-email');
+        error.config.url.includes('/auth/check-email') ||
+        error.config.url.includes('/auth/admin/login');
 
       if (!isAuthEndpoint) {
         localStorage.removeItem('civicfix_token');
@@ -71,6 +72,9 @@ api.interceptors.response.use(
   }
 );
 
+// ─────────────────────────────────────────────────────
+// AUTH API
+// ─────────────────────────────────────────────────────
 export const authAPI = {
   checkEmail: async (email) => {
     const response = await api.post('/auth/check-email', { email });
@@ -87,6 +91,16 @@ export const authAPI = {
     return response.data;
   },
 
+  /**
+   * Dedicated admin login — hits /api/auth/admin/login.
+   * Used ONLY by the hidden admin login page.
+   * Never called from the public citizen login flow.
+   */
+  adminLogin: async (credentials) => {
+    const response = await api.post('/auth/admin/login', credentials);
+    return response.data;
+  },
+
   getMe: async () => {
     const response = await api.get('/auth/me');
     return response.data;
@@ -100,8 +114,56 @@ export const authAPI = {
     }
   },
 
+  /**
+   * Verify server-side admin status.
+   * Backend returns 403 for citizens, 401 for unauthenticated, 200 for admin.
+   */
   checkAdmin: async () => {
     const response = await api.get('/auth/admin-check');
+    return response.data;
+  },
+};
+
+// ─────────────────────────────────────────────────────
+// ISSUES API
+// ─────────────────────────────────────────────────────
+export const issuesAPI = {
+  /**
+   * Submit a new civic issue report.
+   * Image (if any) must be a base64 data URL, validated server-side.
+   */
+  createIssue: async (issueData) => {
+    const response = await api.post('/issues', issueData);
+    return response.data;
+  },
+
+  /**
+   * Get all issues for admin review (includes imageUrl).
+   * Requires admin JWT — returns 403 for citizens.
+   */
+  getAllIssues: async (filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.status && filters.status !== 'All') params.append('status', filters.status);
+    if (filters.category && filters.category !== 'All') params.append('category', filters.category);
+    if (filters.withPhoto) params.append('withPhoto', 'true');
+
+    const response = await api.get(`/issues/admin?${params.toString()}`);
+    return response.data;
+  },
+
+  /**
+   * Update issue status (admin only).
+   */
+  updateIssueStatus: async (ticketId, status) => {
+    const response = await api.patch(`/issues/admin/${ticketId}/status`, { status });
+    return response.data;
+  },
+
+  /**
+   * Get recent public issues (no auth required, no images).
+   */
+  getPublicIssues: async () => {
+    const response = await api.get('/issues/public');
     return response.data;
   },
 };

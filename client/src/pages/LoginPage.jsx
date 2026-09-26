@@ -71,9 +71,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-slate-50 relative overflow-hidden">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-transparent relative overflow-hidden">
       {/* Background radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-96 bg-emerald-100/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-96 bg-emerald-950/20 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
       <div className="max-w-md w-full">
         {/* Header */}
@@ -89,13 +89,22 @@ const LoginPage = () => {
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
             Sign in to CivicFix
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1 font-medium">
             Access your civic complaints, track resolutions, or moderate city wards.
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xl p-6 sm:p-8 space-y-6">
+        <div
+          className="rounded-2xl p-6 sm:p-8 space-y-6"
+          style={{
+            background: 'rgba(235, 245, 238, 0.78)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            border: '1px solid rgba(180, 206, 188, 0.45)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.25)',
+          }}
+        >
           {/* Error Banner */}
           {(error || validationError) && (
             <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs sm:text-sm text-red-700 flex items-start gap-2.5 animate-in fade-in">
@@ -199,35 +208,23 @@ const LoginPage = () => {
             </button>
           </form>
 
-          {/* Quick Demo Login Auto-fill Bar */}
+          {/* Quick Demo Login Auto-fill (Citizen only) */}
           <div className="pt-2 border-t border-slate-100 space-y-2">
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="font-semibold">Quick Demo Logins (Instant Testing):</span>
+              <span className="font-semibold">Quick Demo Login:</span>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="grid grid-cols-1 gap-2 text-xs">
               <button
                 type="button"
                 id="demo-citizen-btn"
                 onClick={() =>
-                  handleQuickFill('citizen@civicfix.gov', 'CivicCitizen@2026!')
+                  handleQuickFill('citizen@civicsense.gov', 'CivicCitizen@2026!')
                 }
                 className="p-2 rounded-lg border border-slate-200 hover:border-emerald-400 bg-slate-50 hover:bg-emerald-50/50 text-slate-700 text-left transition-colors"
               >
-                <p className="font-bold text-slate-800">Jane Citizen</p>
-                <p className="text-[10px] text-slate-500">citizen@civicfix.gov</p>
-              </button>
-
-              <button
-                type="button"
-                id="demo-admin-btn"
-                onClick={() =>
-                  handleQuickFill('admin@civicfix.gov', 'CivicAdmin@2026!')
-                }
-                className="p-2 rounded-lg border border-slate-200 hover:border-indigo-400 bg-slate-50 hover:bg-indigo-50/50 text-slate-700 text-left transition-colors"
-              >
-                <p className="font-bold text-slate-800">Chief Officer</p>
-                <p className="text-[10px] text-slate-500">admin@civicfix.gov</p>
+                <p className="font-bold text-slate-800">Demo Citizen</p>
+                <p className="text-[10px] text-slate-500">citizen@civicsense.gov</p>
               </button>
             </div>
           </div>

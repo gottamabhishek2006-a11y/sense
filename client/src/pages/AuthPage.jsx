@@ -178,9 +178,9 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-slate-50 relative overflow-hidden">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-transparent relative overflow-hidden">
       {/* Background radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-96 bg-emerald-100/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-96 bg-emerald-950/20 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
       <div className="max-w-md w-full">
         {/* Header */}
@@ -199,7 +199,7 @@ const AuthPage = () => {
             {step === 'login' && 'Welcome Back'}
             {step === 'signup' && 'Create Citizen Account'}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1 font-medium">
             {step === 'email' &&
               'Enter your email address to sign in or create a real citizen account.'}
             {step === 'login' &&
@@ -210,7 +210,16 @@ const AuthPage = () => {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xl p-6 sm:p-8 space-y-6">
+        <div
+          className="rounded-2xl p-6 sm:p-8 space-y-6"
+          style={{
+            background: 'rgba(235, 245, 238, 0.78)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            border: '1px solid rgba(180, 206, 188, 0.45)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.25)',
+          }}
+        >
           {/* Error Banner */}
           {(formError || authError) && (
             <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs sm:text-sm text-red-700 flex items-start gap-2.5 animate-in fade-in">

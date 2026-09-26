@@ -4,9 +4,16 @@ import { ShieldAlert, Phone, Mail, MapPin, Heart, ExternalLink } from 'lucide-re
 
 const Footer = () => {
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-16 pb-12 border-t border-slate-800">
+    <footer
+      className="text-slate-300 pt-16 pb-12 border-t border-emerald-900/20"
+      style={{
+        background: 'rgba(10, 22, 17, 0.85)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-800">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-emerald-900/20">
           {/* Column 1: Brand Info */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">

@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     isAuthenticated: !!token && !!user,
-    isAdmin: user?.role === 'admin',
+    isAdmin: user?.role === 'admin', // Strict check — 'authorized' role no longer grants admin
     isLoading,
     error,
     login,

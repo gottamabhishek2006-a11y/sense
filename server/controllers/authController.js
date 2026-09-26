@@ -2,7 +2,7 @@ const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 
 // Strong password regex: min 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]).{8,}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 // Cookie configuration helper supporting cross-site HTTPS (Render <-> Vercel) and localhost HTTP
@@ -65,6 +65,7 @@ const checkEmail = async (req, res, next) => {
  * @desc    Register a new citizen user
  * @route   POST /api/auth/signup
  * @access  Public
+ * Security: Backend ALWAYS assigns role: 'citizen' — never trusts client-submitted role.
  */
 const signup = async (req, res, next) => {
   try {
@@ -121,12 +122,12 @@ const signup = async (req, res, next) => {
       });
     }
 
-    // 7. Security: Strictly assign 'citizen' role
+    // 7. Security: Strictly assign 'citizen' role — NEVER trust req.body.role
     const user = await User.create({
       name: name.trim(),
       email: normalizedEmail,
       password: password.trim(),
-      role: 'citizen',
+      role: 'citizen', // Hardcoded. Client cannot override this.
     });
 
     // 8. Generate JWT & set secure cookie
@@ -151,9 +152,12 @@ const signup = async (req, res, next) => {
 };
 
 /**
- * @desc    Authenticate user & return JWT session
+ * @desc    Authenticate citizen & return JWT session
  * @route   POST /api/auth/login
  * @access  Public
+ * Note: Admin should use /api/auth/admin/login instead.
+ *       This endpoint works for citizens. If admin credentials are submitted
+ *       here, it still works (for usability), but role is from DB.
  */
 const login = async (req, res, next) => {
   try {
@@ -178,7 +182,7 @@ const login = async (req, res, next) => {
       });
     }
 
-    // Compare password with bcrypt
+    // Compare password with bcrypt hash
     let isMatch = await user.comparePassword(password);
     if (!isMatch && cleanPassword !== password) {
       isMatch = await user.comparePassword(cleanPassword);
@@ -198,6 +202,74 @@ const login = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: 'Logged in successfully.',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Dedicated admin authentication endpoint
+ * @route   POST /api/auth/admin/login
+ * @access  Public (but not linked in citizen UI)
+ * Security:
+ *   - Only succeeds if credentials match the account with role === 'admin'
+ *   - Backend independently verifies role from DB (never trusts client)
+ *   - Stricter rate limiting applied at route level
+ *   - Returns 401 for ANY credential mismatch (no role hints in error messages)
+ */
+const adminLogin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide both email and password.',
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const cleanPassword = typeof password === 'string' ? password.trim() : password;
+
+    // Find the account
+    const user = await User.findOne({ email: normalizedEmail });
+
+    // Deliberately vague error — don't reveal whether email exists or role mismatch
+    const authFailed = () =>
+      res.status(401).json({
+        success: false,
+        message: 'Invalid administrative credentials.',
+      });
+
+    if (!user) return authFailed();
+
+    // CRITICAL: Backend independently verifies this account is the admin
+    // This check happens on the DB record, not from any client-submitted field
+    if (user.role !== 'admin') return authFailed();
+
+    // Verify password
+    let isMatch = await user.comparePassword(password);
+    if (!isMatch && cleanPassword !== password) {
+      isMatch = await user.comparePassword(cleanPassword);
+    }
+    if (!isMatch) return authFailed();
+
+    // Generate JWT with admin role embedded
+    const token = generateToken(user._id, user.role);
+    setAuthCookie(res, token, req);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Administrative session authenticated.',
       token,
       user: {
         id: user._id,
@@ -264,7 +336,7 @@ const healthCheck = (req, res) => {
   res.status(200).json({
     status: 'online',
     timestamp: new Date().toISOString(),
-    service: 'CivicFix Auth & API Service',
+    service: 'CivicSense Auth & API Service',
   });
 };
 
@@ -272,6 +344,7 @@ module.exports = {
   checkEmail,
   signup,
   login,
+  adminLogin,
   getMe,
   logout,
   healthCheck,

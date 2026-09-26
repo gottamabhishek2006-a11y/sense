@@ -3,12 +3,49 @@
 @tailwind utilities;
 
 @layer base {
-  html {
+  :root, html {
     scroll-behavior: smooth;
+    color-scheme: light;
   }
   
   body {
     @apply text-slate-900 antialiased font-sans;
+  }
+
+  /* Universal high-contrast, sharp text for form controls */
+  input:not(.admin-input):not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  textarea:not(.admin-input),
+  select:not(.admin-input) {
+    color: #0f172a !important; /* solid deep slate-900 text */
+    background-color: #ffffff !important;
+  }
+
+  input:not(.admin-input)::placeholder,
+  textarea:not(.admin-input)::placeholder {
+    color: #94a3b8 !important; /* slate-400 */
+    opacity: 1 !important;
+  }
+
+  /* Browser autofill fix so text remains dark slate instead of washed out white/gray */
+  input:not(.admin-input):-webkit-autofill,
+  input:not(.admin-input):-webkit-autofill:hover, 
+  input:not(.admin-input):-webkit-autofill:focus,
+  input:not(.admin-input):-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #0f172a !important;
+    caret-color: #0f172a !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* Admin dark input styles & autofill support */
+  .admin-input:-webkit-autofill,
+  .admin-input:-webkit-autofill:hover,
+  .admin-input:-webkit-autofill:focus,
+  .admin-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+    -webkit-text-fill-color: #f8fafc !important;
+    caret-color: #ffffff !important;
+    transition: background-color 5000s ease-in-out 0s;
   }
 }
 

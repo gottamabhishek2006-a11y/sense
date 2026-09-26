@@ -139,7 +139,7 @@ const AdminLoginPage = () => {
                   placeholder="admin@domain.gov"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-800/60 border border-slate-600/50 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
+                  className="admin-input w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-800/60 border border-slate-600/50 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
                 />
               </div>
             </div>
@@ -162,7 +162,7 @@ const AdminLoginPage = () => {
                   placeholder="Enter admin password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-800/60 border border-slate-600/50 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
+                  className="admin-input w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-800/60 border border-slate-600/50 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
                 />
                 <button
                   type="button"
